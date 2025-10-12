@@ -290,11 +290,7 @@ def main():
 
         download_files(user_id, question_id, language)
 
-       
-        # Execute code
-        result = execute_code(language, user_id, question_id)
-
-        # DEBUG: List all running containers
+        result = execute_code(language, user_id, question_id) 
         try:
             import subprocess
             log_message("=== DEBUG: CHECKING RUNNING CONTAINERS ===")
@@ -312,7 +308,7 @@ def main():
         except Exception as e:
             log_message(f"Failed to check containers: {e}")
 
-        # Output result as JSON for Java to parse
+        
         print(json.dumps(result))
         log_message("=== JUDGE SYSTEM COMPLETED ===")
 
