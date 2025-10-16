@@ -23,13 +23,13 @@ def download_files(user_id, question_id, language):
 
         s3_client = boto3.client("s3")
         extension = get_file_extension(language)
-        s3_key = f"Questions/{question_id}/{language}/{user_id}-(main.{extension})"
+        s3_key = f"Questions/{question_id}/{language}/{user_id}-(Main.{extension})"
 
         log_message(f"Downloading user code from S3: {s3_key}")
         local_code_path = f"/home/judgeuser/workspace/code/{user_id}/{question_id}"
         os.makedirs(local_code_path, exist_ok=True)
 
-        local_file_path = os.path.join(local_code_path, f"main.{extension}")
+        local_file_path = os.path.join(local_code_path, f"Main.{extension}")
         s3_client.download_file(
             Bucket=os.getenv("AWS_S3_BUCKET_NAME"),
             Key=s3_key,
@@ -101,7 +101,7 @@ def execute_cpp_code(user_id, question_id):
 
     log_message("Compiling C++ code")
     compile_result = subprocess.run(
-        ["g++", "main.cpp", "-o", "main.out"],
+        ["g++", "Main.cpp", "-o", "Main.out"],
         cwd=local_code_path,
         capture_output=True,
         text=True,
@@ -128,7 +128,7 @@ def execute_cpp_code(user_id, question_id):
 
     log_message("Running C++ program")
     run_result = subprocess.run(
-        ["./main.out"],
+        ["./Main.out"],
         cwd=local_code_path,
         input=input_content,
         capture_output=True,
@@ -168,7 +168,7 @@ def execute_py_code(user_id, question_id):
     try:
         log_message("Running Python code")
         run_result = subprocess.run(
-            ["python3", "main.py"],
+            ["python3", "Main.py"],
             cwd=local_code_path,
             capture_output=True,
             text=True,
@@ -210,7 +210,7 @@ def execute_py_code(user_id, question_id):
 def execute_java_code(user_id, question_id):
 
     local_code_path = f"/home/judgeuser/workspace/code/{user_id}/{question_id}"
-    source_file = "main.java"
+    source_file = "Main.java"
     class_name = os.path.splitext(source_file)[0]
 
     log_message("Compiling Java code")
