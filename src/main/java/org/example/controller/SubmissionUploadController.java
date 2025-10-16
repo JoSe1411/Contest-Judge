@@ -36,7 +36,7 @@ public ResponseEntity<String> submitCode(
         logger.info("Received submission - User: {}, Question: {}, Language: {}", userId, questionId, language);
         
         String extension = s3Manager.getFileExtension(language);
-        String s3Key = String.format("Questions/%s/%s/%s-(main.%s)",
+        String s3Key = String.format("Questions/%s/%s/%s-(Main.%s)",
                                   questionId, language, userId, extension);
         s3Manager.uploadCode(s3Key, code);
         logger.info("Code uploaded to S3: {}", s3Key);
