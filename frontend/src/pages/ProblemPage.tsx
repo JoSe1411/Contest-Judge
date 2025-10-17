@@ -65,10 +65,10 @@ export default function ProblemPage() {
 
   return (
     <QueryClientProvider client={qc}>
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center" style={{ padding: '2rem' }}>
-        <div style={{ width: '100%', maxWidth: '1400px' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '3rem' }}>
-            <div className="panel p-6 overflow-auto">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-8">
+        <div className="w-full max-w-7xl h-[90vh]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 h-full">
+            <div className="panel p-6 overflow-auto max-h-full">
               <ProblemPanel problem={problem} />
             </div>
             <div className="flex flex-col overflow-hidden gap-3">
