@@ -73,7 +73,7 @@ export default function ProblemPage() {
             </div>
             <div className="flex flex-col overflow-hidden gap-3">
               <div className="panel px-3 py-3 flex items-center justify-between">
-                <div className="text-sm font-medium">{problem?.title || 'Problem'}</div>
+                <div className="text-lg font-semibold">{problem?.title || 'Problem'}</div>
                 <LanguageSelect value={language} onChange={setLanguage} />
               </div>
               <div className="h-[50vh] min-h-[350px]">

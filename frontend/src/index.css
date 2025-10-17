@@ -23,7 +23,11 @@ body {
 /* Design utilities */
 @layer utilities {
   .panel {
-    @apply bg-gray-950 rounded-xl ring-1 ring-white/5 shadow-xl shadow-black/40;
+    @apply bg-gray-950 rounded-xl ring-2 ring-blue-500/20 shadow-xl shadow-black/40;
+    box-shadow:
+      0 0 0 1px rgba(59, 130, 246, 0.1),
+      0 0 20px rgba(59, 130, 246, 0.1),
+      0 10px 25px -5px rgba(0, 0, 0, 0.4);
   }
 
   .btn-cta {
