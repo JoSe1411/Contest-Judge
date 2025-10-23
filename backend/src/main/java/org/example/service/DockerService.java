@@ -1,11 +1,14 @@
 package org.example.service;
 
+import org.example.dto.ExecutionResult;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.WaitContainerResultCallback;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.model.Frame;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class DockerService{
     private final Logger logger;
     private final DockerClient dockerClient;
+    private final ObjectMapper objectMapper;
 
     @Value("${aws.access.key.id}")
     private String accessKeyId;
@@ -28,9 +32,10 @@ public class DockerService{
     @Value("${aws.s3.bucket.name}")
     private String bucketName;
 
-    public DockerService(DockerClient dockerClient){
+    public DockerService(DockerClient dockerClient,ObjectMapper objectMapper){
         this.logger = LoggerFactory.getLogger(DockerService.class);
         this.dockerClient = dockerClient;
+        this.objectMapper = objectMapper;
     }
 
     String captureContainerLogs(String containerId){
@@ -88,15 +93,16 @@ public class DockerService{
                    logs.length() > 500 ? logs.substring(0, 500) + "..." : logs);
         return null;
     }
-    public void createAndRunJudgeContainer(String userId, String questionId, String language){
+    public ExecutionResult createAndRunJudgeContainer(String userId, String questionId, String language){
         String timestamp = String.valueOf(System.currentTimeMillis());
         String randomSuffix = String.valueOf((int)(Math.random() * 10000));
         String containerName = "Judge-" + userId + "-" + questionId + "-" + timestamp + "-" + randomSuffix;
         logger.info("Container Name - "+containerName);
+        String containerId = null;
         try{
             logger.info("Creating fresh container: {}", containerName);
 
-            String containerId = dockerClient.createContainerCmd("contest-judge")
+            containerId = dockerClient.createContainerCmd("contest-judge")
                     .withName(containerName)
                     .withWorkingDir("/home/judgeuser/workspace")
                     .withEnv("USER_ID="+userId,
@@ -127,29 +133,39 @@ public class DockerService{
 
             
             String resultJson = extractLastJson(logs);
-            logger.info("Extracted JSON result: {}", resultJson != null ? resultJson : "NULL");
 
-            try {
-                dockerClient.stopContainerCmd(containerId).exec();
-                logger.info("Container "+containerName+" stopped.");
-            }  catch (Exception e) {
-                logger.warn("Stop failed: {}", e.getMessage());
-            }
-            try {
-                dockerClient.removeContainerCmd(containerId)
-                    .withForce(true)
-                    .withRemoveVolumes(true)
-                    .exec();
-                    logger.info("Container "+containerName+" removed.");
-            }  catch (Exception e) {
-                logger.warn("Remove failed: {}", e.getMessage());
-            }
+            logger.info(resultJson);
 
+            if (resultJson == null) {
+                logger.error("No JSON result found in container logs");
+                throw new RuntimeException("No JSON result found in container logs");
+            }
+            logger.info("Extracted JSON result: {}", resultJson);
+            
+            ExecutionResult result = objectMapper.readValue(resultJson,ExecutionResult.class);
+
+            return result;
         } catch(Exception e){
             logger.error("Failed to create and start container {} - {}", containerName, e.getMessage(), e);
             throw new RuntimeException("The container could not be created or started: " + e.getMessage(), e);
-        }
-        
-        
+        } finally {
+            if (containerId != null) {
+                try {
+                    dockerClient.stopContainerCmd(containerId).exec();
+                    logger.info("Container "+containerName+" stopped.");
+                } catch (Exception e) {
+                    logger.warn("Stop failed: {}", e.getMessage());
+                }
+                try {
+                    dockerClient.removeContainerCmd(containerId)
+                            .withForce(true)
+                            .withRemoveVolumes(true)
+                            .exec();
+                    logger.info("Container "+containerName+" removed.");
+                } catch (Exception e) {
+                    logger.warn("Remove failed: {}", e.getMessage());
+                }
+            }
+        }  
     }
 }

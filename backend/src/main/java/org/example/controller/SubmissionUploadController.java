@@ -1,10 +1,13 @@
 package org.example.controller;
 
+import org.example.dto.SubmissionRequest;
+import org.example.dto.ExecutionResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.example.service.S3ManagerService;
 import org.example.service.DockerService;
 import org.slf4j.Logger;
@@ -26,13 +29,13 @@ public class SubmissionUploadController{
         return ResponseEntity.ok("Contest Judge API is running! Use POST /submit to submit code.");
     }
 @PostMapping("/submit")
-public ResponseEntity<String> submitCode(
-    @RequestParam String userId,
-    @RequestParam String questionId,
-    @RequestParam String language,
-    @RequestParam String code
-) {
+public ExecutionResult submitCode(@RequestBody SubmissionRequest submissionRequest) {
     try {
+        String userId = submissionRequest.getUserId();
+        String questionId = submissionRequest.getQuestionId();
+        String language = submissionRequest.getLanguage();
+        String code = submissionRequest.getCode();
+
         logger.info("Received submission - User: {}, Question: {}, Language: {}", userId, questionId, language);
         
         String extension = s3Manager.getFileExtension(language);
@@ -41,14 +44,20 @@ public ResponseEntity<String> submitCode(
         s3Manager.uploadCode(s3Key, code);
         logger.info("Code uploaded to S3: {}", s3Key);
 
-        dockerService.createAndRunJudgeContainer(userId, questionId, language);
-        return ResponseEntity.ok("✅ Code executed successfully! Check container logs for detailed results.");
+        ExecutionResult finalResult =  dockerService.createAndRunJudgeContainer(userId, questionId, language);
+        logger.info("✅ Code executed successfully! Check container logs for detailed results.");
+
+        return finalResult;        
 
     } catch (Exception e) {
-        logger.error("Error processing submission for user {}: {}", userId, e.getMessage(), e);
-        return ResponseEntity.internalServerError().body(
-            String.format("❌ Error processing submission: %s", e.getMessage())
-        );
+        logger.error("Error processing submission for user : {}", e.getMessage(), e);
+        ExecutionResult errorOutput = new ExecutionResult();
+         errorOutput.setExitCode(1) ;
+         errorOutput.setOutput("Error Executing the code.");
+         errorOutput.setExpected("");
+         errorOutput.setPassed(false);
+         errorOutput.setError(e.getMessage());
+        return errorOutput;
     }
 }
 

@@ -15,7 +15,6 @@ def download_files(user_id, question_id, language):
     
     try:
         log_message("=== DOWNLOADING FILES ===")
-
         
         if not user_id or not question_id or not language:
             raise ValueError(
@@ -308,6 +307,7 @@ def main():
         except Exception as e:
             log_message(f"Failed to check containers: {e}")
 
+        
         
         print(json.dumps(result))
         log_message("=== JUDGE SYSTEM COMPLETED ===")

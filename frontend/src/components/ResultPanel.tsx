@@ -53,3 +53,5 @@ export default function ResultPanel({ result, isLoading, errorText }: Props) {
 }
 
 
+
+
