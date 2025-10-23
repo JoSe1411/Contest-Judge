@@ -1,4 +1,4 @@
-# ContestJudge System
+# Contest Judge System
 
 A full-stack online contest judge platform that allows users to solve programming problems, submit code, and receive execution results through a web interface.
 
