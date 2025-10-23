@@ -21,7 +21,7 @@ async function fetchProblem(id: string): Promise<Problem> {
 }
 
 export default function ProblemPage() {
-  const { questionId = 'two-sum' } = useParams();
+  const { questionId = '1' } = useParams();
   const [problem, setProblem] = useState<Problem | null>(null);
   const [language, setLanguage] = useState<Language>('py');
   const [code, setCode] = useState<string>(languageTemplates.py);
