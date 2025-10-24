@@ -1,6 +1,6 @@
 # ContestJudge Frontend
 
-![ContestJudge Interface - Two Sum Problem](../image.png)
+![ContestJudge Interface - Two Sum Problem](./assests/image.png)
 *Sample code for the Two Sum problem showing the interactive code editor and problem interface*
 
 A modern React TypeScript frontend for the ContestJudge online programming contest platform. Provides an interactive code editor, problem solving interface, and real-time code execution capabilities.
