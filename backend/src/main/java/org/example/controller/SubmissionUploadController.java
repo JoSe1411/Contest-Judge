@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.example.entity.Submission;
+import org.springframework.web.bind.annotation.PathVariable;
+import java.util.UUID;
 
 @RestController
 public class SubmissionUploadController {
@@ -32,5 +35,15 @@ public class SubmissionUploadController {
                 request.getUserId(), request.getQuestionId(), request.getLanguage());
 
         return submissionService.submitCode(request);
+    }
+
+    @GetMapping("/submission/{id}")
+    public Submission getSubmission(@PathVariable UUID id) {
+        return submissionService.getSubmission(id);
+    }
+
+    @PostMapping("/run-compare")
+    public org.example.dto.ExecutionResult runCompare(@Valid @RequestBody org.example.dto.RunCompareRequest request) {
+        return submissionService.runCompare(request);
     }
 }

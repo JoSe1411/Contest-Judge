@@ -22,7 +22,7 @@ def download_files(user_id, question_id, language):
 
         s3_client = boto3.client("s3")
         extension = get_file_extension(language)
-        s3_key = f"Questions/{question_id}/{language}/{user_id}-(Main.{extension})"
+        s3_key = os.getenv("S3_KEY")
 
         log_message(f"Downloading user code from S3: {s3_key}")
         local_code_path = f"/home/judgeuser/workspace/code/{user_id}/{question_id}"

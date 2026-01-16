@@ -13,7 +13,6 @@ import java.util.UUID;
 public class Submission {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID submissionId;
 
     @Column(name = "user_id", nullable = false)

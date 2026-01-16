@@ -48,7 +48,7 @@ RUN chmod 755 /home/judgeuser/workspace
 RUN touch output.txt input.txt && chmod 666 output.txt input.txt
 
 
-COPY docker/contest_judge_downloader.py /home/judgeuser/workspace/
+COPY contest_judge_downloader.py /home/judgeuser/workspace/
 RUN chmod +x /home/judgeuser/workspace/contest_judge_downloader.py
 
 

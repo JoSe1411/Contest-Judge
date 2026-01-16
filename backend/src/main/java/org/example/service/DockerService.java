@@ -92,7 +92,8 @@ public class DockerService {
         return null;
     }
 
-    public ExecutionResult createAndRunJudgeContainer(String userId, String questionId, String language) {
+    public ExecutionResult createAndRunJudgeContainer(String userId, String questionId, String language, String s3Key,
+            String customInput) {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String randomSuffix = String.valueOf((int) (Math.random() * 10000));
         String containerName = "Judge-" + userId + "-" + questionId + "-" + timestamp + "-" + randomSuffix;
@@ -100,6 +101,8 @@ public class DockerService {
         String containerId = null;
         try {
             logger.info("Creating fresh container: {}", containerName);
+
+            String inputEnv = customInput != null ? customInput : "";
 
             containerId = dockerClient.createContainerCmd("contest-judge")
                     .withName(containerName)
@@ -110,9 +113,11 @@ public class DockerService {
                                     .withMemorySwap(256 * 1024 * 1024L) // No swap (same as memory)
                                     .withCpuCount(1L)
                                     .withPidsLimit(100L))
-                    .withEnv("USER_ID=" + userId,
+                    .withEnv("S3_KEY=" + s3Key,
+                            "USER_ID=" + userId,
                             "QUESTION_ID=" + questionId,
                             "LANGUAGE=" + language,
+                            "CUSTOM_INPUT=" + inputEnv,
                             "AWS_ACCESS_KEY_ID=" + accessKeyId,
                             "AWS_SECRET_ACCESS_KEY=" + secretAccessKey,
                             "AWS_DEFAULT_REGION=" + region,
